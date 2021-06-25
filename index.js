@@ -13,14 +13,10 @@ const http = require('http');
 const compression = require('compression');
 const path = require('path');
 const libRouter = require('./lib');
-const {wsServer, onUpgrade} = require('./lib/websockets');
+
 
 
 const app = express();
-app.use((req, res, next) => {
-    req.wsServer = wsServer;
-    next();
-})
 app.set('trust proxy', 'loopback');
 app.use(compression());
 app.use(helmet());
@@ -38,7 +34,6 @@ app.use(libRouter.router);
 
 const {PORT, NODE_ENV} = process.env;
 const server = http.createServer(app);
-server.on('upgrade', onUpgrade);
 
 server.listen(PORT);
 debug(`server started on port: ${PORT}; mode: ${NODE_ENV}`);
