@@ -1,0 +1,16 @@
+{
+  "verbose": true,
+  "ignore": [
+    "node_modules/",
+    "node_modules/**/node_modules"
+  ],
+  "watch": [
+    "lib",
+    "index.js",
+    "views"
+  ],
+  "ext": "js,pug,json",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

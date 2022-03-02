@@ -1,19 +1,19 @@
-const dotenv  = require('dotenv').config();
-if (dotenv.error) {
-    console.log('*** error loading .env', dotenv.error);
-    return;
+import 'dotenv/config';
+import Debug from 'debug';
+import express from 'express';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+import http from 'node:http';
+import compression from 'compression';
+import path from 'node:path';
+import {router} from './lib/index.js';
+
+if (!process.env.PORT) {
+    console.log('*** error loading .env - PORT is not set',);
+    process.exit(1);
 }
-
-const debug = require('debug')('chums:index');
-const express = require('express');
-const helmet = require('helmet');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const http = require('http');
-const compression = require('compression');
-const path = require('path');
-const libRouter = require('./lib');
-
+const debug = Debug('chums:index');
 
 
 const app = express();
@@ -26,11 +26,10 @@ app.use(helmet());
 // })
 app.set('json spaces', 2);
 app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, '/views'));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(libRouter.router);
+app.use(router);
 
 const {PORT, NODE_ENV} = process.env;
 const server = http.createServer(app);
