@@ -15,6 +15,7 @@ async function uploadLifestyle(req, res) {
             fit: 'inside',
         });
         const images = [image, original];
+        const result = await await saveImageProps()
         const saveResult = await Promise.all(images.map(img => saveImageProps(img.path, img.filename)));
         res.json({
             ...upload,

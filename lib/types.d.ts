@@ -22,6 +22,7 @@ export interface ImageProps {
     notes?: string,
     item_code?: string,
     preferred_image?: boolean,
+    active?: boolean,
 }
 export interface ImageRecord extends ImageProps{
     filename: string,
