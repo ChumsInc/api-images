@@ -1,3 +1,14 @@
+import {RowDataPacket} from "mysql2";
+import {
+    BaseSKU,
+    CountryOfOrigin,
+    PrimaryVendor,
+    ProductCategory,
+    ProductCollection,
+    ProductLine,
+    ProductStatus
+} from "chums-types";
+
 export type ImageSizePath = '80'|'125'|'250'|'400'|'800'|'2048'|'originals';
 
 export interface ImageSize {
@@ -109,3 +120,11 @@ export interface GenericImage extends ImageSize {
     path: string,
     filename: string,
 }
+
+export type ProductLineRecord = ProductLine & RowDataPacket;
+export type CategoryRecord = ProductCategory & RowDataPacket;
+export type CollectionRecord = ProductCollection & RowDataPacket;
+export type BaseSKURecord = BaseSKU & RowDataPacket;
+export type CountryOfOriginRecord = CountryOfOrigin & RowDataPacket;
+export type PrimaryVendorRecord = PrimaryVendor & RowDataPacket;
+export type ProductStatusRecord = ProductStatus & RowDataPacket;
