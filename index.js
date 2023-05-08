@@ -6,7 +6,6 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import http from 'node:http';
 import compression from 'compression';
-import path from 'node:path';
 import {router} from './lib/index.js';
 
 if (!process.env.PORT) {
@@ -20,10 +19,6 @@ const app = express();
 app.set('trust proxy', 'loopback');
 app.use(compression());
 app.use(helmet());
-// app.use(function (req, res, next) {
-//     res.setHeader('Cross-Origin-Resource-Policy', 'same-site')
-//     next()
-// })
 app.set('json spaces', 2);
 app.set('view engine', 'pug');
 app.use(cookieParser());
