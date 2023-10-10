@@ -1,6 +1,6 @@
 {
   "name": "api-images",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "CHUMS Images API / Utilities",
   "main": "index.js",
   "type": "module",
