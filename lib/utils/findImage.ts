@@ -9,6 +9,8 @@ const debug = Debug('chums:lib:product-images:findImage');
 
 const COMMON_IMAGE_PATH = '/var/www';
 
+const validSizes:string[] = ['80','250','400','800'];
+
 export const findImageFile = async (size: string | number, itemCode: string): Promise<string | null> => {
     try {
         const dir = '/images/products/:size'
@@ -40,6 +42,9 @@ export const findImageFile = async (size: string | number, itemCode: string): Pr
 
 export const findImage = async (req: Request, res: Response) => {
     const {size, itemCode} = req.params;
+    if (!validSizes.includes(size)) {
+        return res.json({error: 'Invalid image size'});
+    }
     const dir = '/images/products/:size'.replace(':size', size);
 
     try {
@@ -106,6 +111,9 @@ async function findImageList(itemCodes: string[], size: string): Promise<ItemIma
 export const getImageList = async (req: Request, res: Response) => {
     try {
         const {size} = req.params;
+        if (!size || !validSizes.includes(size)) {
+            return res.json({error: 'Invalid image size'});
+        }
         if (!req.query.item || typeof req.query.item !== 'string' || req.query.item.length === 0) {
             return res.json({error: 'item query parameter required'});
         }
