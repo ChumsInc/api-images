@@ -34,7 +34,12 @@ async function loadAPIVersion() {
 export const aboutAPI = async (req: Request, res: Response) => {
     try {
         const  version = await loadAPIVersion();
-        res.json({site: '/api/images', version});
+        res.json({
+            site: '/api/images',
+            version,
+            node: process.version,
+            uptime: process.uptime(),
+        });
     } catch (err) {
         if (err instanceof Error) {
             debug("aboutAPI()", err.message);
