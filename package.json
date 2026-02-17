@@ -31,7 +31,9 @@
     "sharp": "^0.34.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@tsconfig/node18": "^18.2.0",
+    "@tsconfig/node24": "^24.0.4",
     "@types/body-parser": "^1.19.0",
     "@types/compression": "^1.7.0",
     "@types/cookie-parser": "^1.4.2",
@@ -40,7 +42,10 @@
     "@types/node": "^24.1.0",
     "@types/ws": "^8.5.1",
     "auto-changelog": "^2.4.0",
-    "nodemon": "^3.0.1"
+    "eslint": "^10.0.0",
+    "globals": "^17.3.0",
+    "nodemon": "^3.0.1",
+    "typescript-eslint": "^8.56.0"
   },
   "auto-changelog": {
     "template": "changelog-template.hbs",

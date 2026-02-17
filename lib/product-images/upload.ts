@@ -1,23 +1,23 @@
 import Debug from 'debug';
-import formidable, {IncomingForm, File} from 'formidable';
+import {File, IncomingForm} from 'formidable';
 import sharp from 'sharp';
 import fs from 'node:fs/promises';
 import {imageSizes, originalsPath, thumbSize, uploadPath, webPath} from './settings.js';
 import {makeImage} from './make-images.js';
 import {saveImageProps} from './list.js';
-import {loadImages, saveImage} from "./db-handler.js";
+import {loadImages} from "./db-handler.js";
 import {BaseImage} from "../types.js";
 import {Request, Response} from "express";
 
 const debug = Debug('chums:lib:product-images:upload');
 
-async function getOriginalSize(filename:string):Promise<BaseImage> {
+async function getOriginalSize(filename: string): Promise<BaseImage> {
     try {
         const imgContent = await fs.readFile(`${originalsPath}/${filename}`);
         const img = sharp(imgContent);
         const {width, height, size} = await img.metadata();
         return {path: 'originals', width: width ?? 0, height: height ?? 0, size: size ?? 0, filename};
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("getOriginalSize()", err.message);
             return Promise.reject(err);
@@ -26,6 +26,7 @@ async function getOriginalSize(filename:string):Promise<BaseImage> {
         return Promise.reject(new Error('Error in getOriginalSize()'));
     }
 }
+
 export interface UploadResponse {
     response: {
         progress: number[];
@@ -34,15 +35,16 @@ export interface UploadResponse {
     file: File;
     filename: string;
 }
-function handleUpload(req:Request):Promise<UploadResponse> {
+
+function handleUpload(req: Request): Promise<UploadResponse> {
     return new Promise((resolve, reject) => {
         const form = new IncomingForm({uploadDir: uploadPath, keepExtensions: true});
         const response = {
             progress: [],
             name: '',
         };
-        form.on('file', (formName, file) => {
-            response.name  = formName;
+        form.on('file', (formName) => {
+            response.name = formName;
         })
         form.on('error', (err) => {
             debug('error', err);
@@ -62,13 +64,13 @@ function handleUpload(req:Request):Promise<UploadResponse> {
             if (err) {
                 return reject(new Error(err));
             }
-            const fileValues = Object.values(files) as File[];
+            const fileValues = Object.values(files) as unknown as File[];
             if (!fileValues.length) {
                 return Promise.reject(new Error('No files found'));
             }
             let [file] = fileValues;
             if (Array.isArray(file)) {
-                let [nextFile] = file as File[];
+                const [nextFile] = file as File[];
                 file = nextFile;
             }
             if (!file || Array.isArray(file)) {
@@ -78,7 +80,7 @@ function handleUpload(req:Request):Promise<UploadResponse> {
             try {
                 await fs.rename(file.filepath, `${originalsPath}/${response.name}`);
                 return resolve({response, file, filename: response.name});
-            } catch(err:unknown) {
+            } catch (err: unknown) {
                 if (err instanceof Error) {
                     debug("()", err.message);
                     return Promise.reject(err);
@@ -90,7 +92,7 @@ function handleUpload(req:Request):Promise<UploadResponse> {
     })
 }
 
-export const uploadProductImages = async (req:Request, res:Response):Promise<void> => {
+export const uploadProductImages = async (req: Request, res: Response): Promise<void> => {
     try {
         const upload = await handleUpload(req);
         const filename = upload.filename;
@@ -108,7 +110,7 @@ export const uploadProductImages = async (req:Request, res:Response):Promise<voi
             thumb: webPath(thumbSize, filename),
             saveResult,
         });
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("uploadProductImages()", err.message);
             res.json({error: err.message, name: err.name});

@@ -29,7 +29,7 @@ async function getDimensions(pathName:string, filename:string):Promise<ImageDime
             size: size ?? 0,
             metadata
         };
-    } catch (err) {
+    } catch (_err) {
         return null;
     }
 }
@@ -66,7 +66,7 @@ async function parseImageProps(buffer:Buffer|string):Promise<ParsedImageProps|nu
     try {
         const {width, height, size, format, space} = await sharp(buffer).metadata();
         return {width, height, size, img_format: format, color_space: space};
-    } catch (err) {
+    } catch (_err) {
         return null;
     }
 }
@@ -105,11 +105,12 @@ export async function saveImageProps(pathname:string, filename:string):Promise<P
 
 export const getList = async (req:Request, res:Response):Promise<void> => {
     try {
-        if (!imagePaths[req.params.size]) {
+        const size = req.params.size as string;
+        if (!imagePaths[size]) {
             res.json({error: 'invalid size'});
             return;
         }
-        const images = await listImages(imagePaths[req.params.size]);
+        const images = await listImages(imagePaths[size]);
         res.json(images);
     } catch(err:unknown) {
         if (err instanceof Error) {
@@ -152,7 +153,8 @@ export const getImageByFilename = async (req:Request, res:Response):Promise<void
 
 export const getImageProps = async (req:Request, res:Response):Promise<void> => {
     try {
-        const sizes = await getImageSizesProps(req.params.filename ?? req.query.filename);
+        const filename = (req.params.filename ?? req.query.filename) as string;
+        const sizes = await getImageSizesProps(filename);
         res.json(sizes);
     } catch(err:unknown) {
         if (err instanceof Error) {
@@ -208,7 +210,7 @@ export async function syncDirectory({pathname, rebuild}:{
 
 export const getSyncDirectory = async (req:Request, res:Response):Promise<void> => {
     try {
-        const {pathname} = req.params;
+        const pathname = req.params.pathname as string;
         const rebuild = req.query.rebuild as string ?? '0';
         const {added, removed, filenames} = await syncDirectory({pathname, rebuild});
         res.json({added, removed, filenames});
@@ -256,7 +258,9 @@ async function buildImageSize(fromSize:string|number, toSize:string|number):Prom
 
 export const resizeFromList = async (req:Request, res:Response):Promise<void> => {
     try {
-        const images = await buildImageSize(req.params.fromSize, req.params.toSize);
+        const fromSize = req.params.fromSize as string;
+        const toSize = req.params.toSize as string;
+        const images = await buildImageSize(fromSize, toSize);
         const filenames = images.filter(img => !!img).map(img => img.filename);
         res.json({filenames});
     } catch(err:unknown) {

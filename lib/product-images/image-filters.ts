@@ -30,7 +30,7 @@ export async function loadWarehouse(): Promise<Warehouse[]> {
                           INNER JOIN c2.im_itemwarehouse iw
                                      ON iw.Company = w.Company
                                          AND iw.WarehouseCode = w.WarehouseCode
-                          INNER JOIN c2.ci_item i
+                          INNER JOIN c2.CI_Item i
                                      ON i.Company = iw.Company
                                          AND i.ItemCode = iw.ItemCode
                           INNER JOIN (SELECT DISTINCT item_code AS ItemCode
@@ -67,7 +67,7 @@ export async function loadProductLines(): Promise<ProductLine[]> {
                                  pl.ExplodeKitItems,
                                  LEFT(pl.ProductLineDesc, 1) <> '#' AS active
                  FROM c2.IM_ProductLine pl
-                          INNER JOIN c2.ci_item i
+                          INNER JOIN c2.CI_Item i
                                      USING (Company, ProductLine)
                           INNER JOIN (SELECT DISTINCT item_code AS ItemCode
                                       FROM c2.PM_Images pmi
@@ -105,7 +105,7 @@ export async function loadCategory2(): Promise<ProductCategory[]> {
                                      c.notes,
                                      JSON_EXTRACT(IFNULL(c.tags, '{}'), '$') AS tags,
                                      c.productLine
-                     FROM c2.ci_item i
+                     FROM c2.CI_Item i
                               INNER JOIN (SELECT DISTINCT item_code AS ItemCode
                                           FROM c2.PM_Images pmi
                                           UNION
@@ -138,7 +138,7 @@ export async function loadCategory2(): Promise<ProductCategory[]> {
 
 export async function loadCategory3(): Promise<ProductCollection[]> {
     const query = `SELECT DISTINCT i.Category3
-                   FROM c2.ci_item i
+                   FROM c2.CI_Item i
                             INNER JOIN (SELECT DISTINCT item_code AS ItemCode
                                         FROM c2.PM_Images pmi
                                         UNION
@@ -174,7 +174,7 @@ export async function loadCategory4(): Promise<BaseSKU[]> {
                                    b.active,
                                    b.notes,
                                    JSON_EXTRACT(IFNULL(b.tags, '{}'), '$') AS tags
-                   FROM c2.ci_item i
+                   FROM c2.CI_Item i
                             INNER JOIN (SELECT DISTINCT item_code AS ItemCode
                                         FROM c2.PM_Images pmi
                                         UNION
@@ -209,7 +209,7 @@ export async function loadCategory4(): Promise<BaseSKU[]> {
 export async function loadCountryOfOrigin(): Promise<CountryOfOrigin[]> {
     try {
         const query = `SELECT DISTINCT IFNULL(i.UDF_COUNTRY_ORIGIN, '') AS countryOfOrigin
-                       FROM c2.ci_item i
+                       FROM c2.CI_Item i
                                 INNER JOIN (SELECT DISTINCT item_code AS ItemCode
                                             FROM c2.PM_Images pmi
                                             UNION
@@ -237,7 +237,7 @@ export async function loadPrimaryVendor(): Promise<PrimaryVendor[]> {
     try {
         const query = `SELECT DISTINCT i.PrimaryVendorNo,
                                        v.VendorName
-                       FROM c2.ci_item i
+                       FROM c2.CI_Item i
                                 INNER JOIN (SELECT DISTINCT item_code AS ItemCode
                                             FROM c2.PM_Images pmi
                                             UNION

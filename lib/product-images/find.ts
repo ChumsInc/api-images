@@ -8,7 +8,8 @@ const debug = Debug('chums:lib:product-images:find');
 const COMMON_IMAGE_PATH = '/var/www';
 
 export const findImage = async (req: Request, res: Response): Promise<void> => {
-    const {size, itemCode} = req.params;
+    const size = req.params.size as string;
+    const itemCode = req.params.itemCode as string;
     const dir = '/images/products/:size'
         .replace(':size', size);
 

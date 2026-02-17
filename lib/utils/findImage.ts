@@ -41,7 +41,8 @@ export const findImageFile = async (size: string | number, itemCode: string): Pr
 }
 
 export const findImage = async (req: Request, res: Response) => {
-    const {size, itemCode} = req.params;
+    const size = req.params.size as string;
+    const itemCode = req.params.itemCode as string;
     if (!validSizes.includes(size)) {
         return res.json({error: 'Invalid image size'});
     }
@@ -110,7 +111,7 @@ async function findImageList(itemCodes: string[], size: string): Promise<ItemIma
 
 export const getImageList = async (req: Request, res: Response) => {
     try {
-        const {size} = req.params;
+        const size = req.params.size as string;
         if (!size || !validSizes.includes(size)) {
             return res.json({error: 'Invalid image size'});
         }

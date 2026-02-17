@@ -127,7 +127,7 @@ export interface ProductAltItem {
 
 export interface ProductAltItemRow extends RowDataPacket, ProductAltItem {
     active: number|boolean;
-};
+}
 
 export interface GenericImage extends ImageSize {
     path: string,
@@ -136,15 +136,18 @@ export interface GenericImage extends ImageSize {
 
 export interface ProductLineRecord extends RowDataPacket, ProductLine {
     active: number|boolean;
-};
+}
+
 export interface CategoryRecord extends RowDataPacket, ProductCategory {
     active: number|boolean;
-};
+}
+
 export type CollectionRecord = ProductCollection & RowDataPacket;
 export interface BaseSKURecord extends RowDataPacket, BaseSKU {
     tags: string;
     active: number|boolean;
 }
+
 export type CountryOfOriginRecord = CountryOfOrigin & RowDataPacket;
 export type PrimaryVendorRecord = PrimaryVendor & RowDataPacket;
 export type ProductStatusRecord = ProductStatus & RowDataPacket;

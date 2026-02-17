@@ -6,7 +6,8 @@ import {
     loadAltItemCodes,
     loadImages,
     removeImagePath,
-    removeImageTag, saveImage,
+    removeImageTag,
+    saveImage,
     setAltItemCode,
     setImageActive,
     setItemCode,
@@ -15,23 +16,23 @@ import {
 } from './db-handler.js';
 import {constants as fsConstants} from 'node:fs';
 import {access, unlink} from 'node:fs/promises';
-import {imagePathNames, imgPath} from './settings.js';
+import {imgPath} from './settings.js';
 import {ProductImage} from "../types.js";
 import {Request, Response} from "express";
 
 const debug = Debug('chums:lib:product-images:image');
 
-async function _removeImage({filename, pathname}:{
+async function _removeImage({filename, pathname}: {
     filename: string;
     pathname: string;
-}):Promise<string> {
+}): Promise<string> {
     try {
         const imgFilePath = imgPath(pathname, filename);
         await access(imgFilePath, fsConstants.W_OK);
         await unlink(imgFilePath);
         await removeImagePath({filename, pathname});
         return imgFilePath;
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("_removeImage()", err.message);
             return Promise.reject(err);
@@ -41,7 +42,7 @@ async function _removeImage({filename, pathname}:{
     }
 }
 
-async function removeImage(filename:string):Promise<ProductImage[]> {
+async function removeImage(filename: string): Promise<ProductImage[]> {
     try {
         const [image] = await loadImages({filename});
         if (!image) {
@@ -51,7 +52,7 @@ async function removeImage(filename:string):Promise<ProductImage[]> {
             await _removeImage({filename, pathname});
         }
         return await loadImages({filename});
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("removeImage()", err.message);
             return Promise.reject(err);
@@ -61,12 +62,13 @@ async function removeImage(filename:string):Promise<ProductImage[]> {
     }
 }
 
-export const postItemCode = async (req:Request, res:Response):Promise<void> => {
+export const postItemCode = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {filename, itemCode = ''} = req.params;
+        const filename = req.params.filename as string;
+        const itemCode = req.params.itemCode as string ?? '';
         const image = await setItemCode({filename, itemCode});
         res.json({image});
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("postItemCode()", err.message);
             res.json({error: err.message, name: err.name});
@@ -76,13 +78,14 @@ export const postItemCode = async (req:Request, res:Response):Promise<void> => {
     }
 };
 
-export const postPreferredItemCode = async (req:Request, res:Response):Promise<void> => {
+export const postPreferredItemCode = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {filename, itemCode} = req.params;
+        const filename = req.params.filename as string;
+        const itemCode = req.params.itemCode as string;
         await setPreferredImage(filename, itemCode);
         const [image] = await loadImages({filename});
         res.json({image});
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("postPreferredItemCode()", err.message);
             res.json({error: err.message, name: err.name});
@@ -92,9 +95,9 @@ export const postPreferredItemCode = async (req:Request, res:Response):Promise<v
     }
 }
 
-export const postItemCodeFilenames = async (req:Request, res:Response):Promise<void> => {
+export const postItemCodeFilenames = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {itemCode} = req.params;
+        const itemCode = req.params.itemCode as string;
         const filenames = req.body?.filenames ?? [];
         if (filenames.length === 0) {
             res.json({images: []});
@@ -102,7 +105,7 @@ export const postItemCodeFilenames = async (req:Request, res:Response):Promise<v
         }
         const images = await applyItemCodeToFilenames({itemCode, filenames});
         res.json({images});
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("postItemCodeFilenames()", err.message);
             res.json({error: err.message, name: err.name});
@@ -112,12 +115,12 @@ export const postItemCodeFilenames = async (req:Request, res:Response):Promise<v
     }
 }
 
-export const getAltItemCodes = async (req:Request, res:Response):Promise<void> => {
+export const getAltItemCodes = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {filename} = req.params;
+        const filename = req.params.filename as string;
         const altItems = await loadAltItemCodes(filename)
         res.json({altItems});
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("getAltItemCodes()", err.message);
             res.json({error: err.message, name: err.name});
@@ -128,12 +131,13 @@ export const getAltItemCodes = async (req:Request, res:Response):Promise<void> =
 }
 
 
-export const postAltItemCode = async (req:Request, res:Response):Promise<void> => {
+export const postAltItemCode = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {filename, itemCode = ''} = req.params;
+        const filename = req.params.filename as string;
+        const itemCode = req.params.itemCode as string ?? '';
         const image = await setAltItemCode({filename, itemCode});
         res.json({image});
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("postAltItemCode()", err.message);
             res.json({error: err.message, name: err.name});
@@ -144,13 +148,13 @@ export const postAltItemCode = async (req:Request, res:Response):Promise<void> =
 };
 
 
-export const postMultipleAltItemCode = async (req:Request, res:Response):Promise<void> => {
+export const postMultipleAltItemCode = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {itemCode} = req.params;
+        const itemCode = req.params.itemCode as string;
         const filenames = req.body?.filenames ?? [];
         const altItems = await setMultipleAltItemCode({filenames, itemCode});
         res.json({altItems});
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("postMultipleAltItemCode()", err.message);
             res.json({error: err.message, name: err.name});
@@ -160,12 +164,13 @@ export const postMultipleAltItemCode = async (req:Request, res:Response):Promise
     }
 };
 
-export const deleteAltItemCode = async (req:Request, res:Response):Promise<void> => {
+export const deleteAltItemCode = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {filename, itemCode = ''} = req.params;
+        const filename = req.params.filename as string;
+        const itemCode = req.params.itemCode as string ?? '';
         const image = await delAltItemCode({filename, itemCode});
         res.json({image});
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("deleteAltItemCode()", err.message);
             res.json({error: err.message, name: err.name});
@@ -176,12 +181,13 @@ export const deleteAltItemCode = async (req:Request, res:Response):Promise<void>
 };
 
 
-export const tagImage = async (req:Request, res:Response):Promise<void> => {
+export const tagImage = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {filename, tag} = req.params;
+        const filename = req.params.filename as string;
+        const tag = req.params.tag as string;
         const image = await addImageTag({filename, tag});
         res.json({image});
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("tagImage()", err.message);
             res.json({error: err.message, name: err.name});
@@ -192,13 +198,13 @@ export const tagImage = async (req:Request, res:Response):Promise<void> => {
 };
 
 
-export const tagImages = async (req:Request, res:Response):Promise<void> => {
+export const tagImages = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {tag} = req.params;
-        const filenames:string[] = req.body?.filenames ?? [];
+        const tag = req.params.tag as string;
+        const filenames: string[] = req.body?.filenames ?? [];
         const images = await Promise.all(filenames.map(filename => addImageTag({filename, tag})));
         res.json({images});
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("tagImages()", err.message);
             res.json({error: err.message, name: err.name});
@@ -208,12 +214,13 @@ export const tagImages = async (req:Request, res:Response):Promise<void> => {
     }
 };
 
-export const untagImage = async (req:Request, res:Response):Promise<void> => {
+export const untagImage = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {filename, tag} = req.params;
+        const filename = req.params.filename as string;
+        const tag = req.params.tag as string;
         const image = await removeImageTag({filename, tag});
         res.json({image});
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("untagImage()", err.message);
             res.json({error: err.message, name: err.name});
@@ -223,11 +230,12 @@ export const untagImage = async (req:Request, res:Response):Promise<void> => {
     }
 };
 
-export const deleteImageFilename = async (req:Request, res:Response):Promise<void> => {
+export const deleteImageFilename = async (req: Request, res: Response): Promise<void> => {
     try {
-        const images = await removeImage(req.params.filename);
+        const filename = req.params.filename as string;
+        const images = await removeImage(filename);
         res.json({images});
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("deleteImageFilename()", err.message);
             res.json({error: err.message, name: err.name});
@@ -237,9 +245,10 @@ export const deleteImageFilename = async (req:Request, res:Response):Promise<voi
     }
 };
 
-export const putImageActive = async (req:Request, res:Response):Promise<void> => {
+export const putImageActive = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {filename, active} = req.params;
+        const filename = req.params.filename as string;
+        const active = req.params.active as string;
         const image = await setImageActive(filename, active);
         res.json({image});
     } catch (err) {
@@ -252,9 +261,9 @@ export const putImageActive = async (req:Request, res:Response):Promise<void> =>
     }
 }
 
-export const putImageProps = async (req:Request, res:Response):Promise<void> => {
+export const putImageProps = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {filename} = req.params;
+        const filename = req.params.filename as string;
         if (!req.body) {
             res.json({error: 'body content required'});
             return;
@@ -267,7 +276,7 @@ export const putImageProps = async (req:Request, res:Response):Promise<void> => 
         const props = {..._image, ...req.body, filename};
         const image = await saveImage(props)
         res.json({image});
-    } catch(err) {
+    } catch (err) {
         if (err instanceof Error) {
             debug("putImageProps()", err.message);
             res.json({error: err.message, name: err.name});

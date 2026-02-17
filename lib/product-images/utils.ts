@@ -35,8 +35,8 @@ async function rebuildSize({fromSize, toSize, test = false}:{
 
 export const listResize = async (req:Request, res:Response):Promise<void> => {
     try {
-        const fromSize = req.params.fromSize ?? req.query.fromSize as string;
-        const toSize = req.params.toSize ?? req.query.toSize as string;
+        const fromSize = (req.params.fromSize ?? req.query.fromSize) as string;
+        const toSize = (req.params.toSize ?? req.query.toSize) as string;
         if (!fromSize || !toSize) {
             res.json({error: 'invalid size', fromSize, toSize});
             return;

@@ -37,7 +37,7 @@ export async function loadImagesByItemList(itemCodes: string[] = []): Promise<It
                                       img.filename,
                                       img.pathnames,
                                       IFNULL(img.preferred_image, 0) AS preferred_image
-                      FROM c2.ci_item i
+                      FROM c2.CI_Item i
                                INNER JOIN c2.PM_Images img
                                           ON img.item_code = i.ItemCode
                       WHERE i.Company = 'chums'
@@ -51,7 +51,7 @@ export async function loadImagesByItemList(itemCodes: string[] = []): Promise<It
                                       pmi.filename,
                                       pmi.pathnames,
                                       IFNULL(pmi.preferred_image, 0) AS preferred_image
-                      FROM c2.ci_item i
+                      FROM c2.CI_Item i
                                INNER JOIN c2.PM_ImageProducts img
                                           ON img.item_code = i.ItemCode
                                INNER JOIN c2.PM_Images pmi
@@ -138,7 +138,7 @@ export async function loadImages({
                    preferred_image,
                    img.active
             FROM c2.PM_Images img
-                     LEFT JOIN c2.ci_item item
+                     LEFT JOIN c2.CI_Item item
                                ON img.item_code = item.ItemCode AND item.company = 'chums'
             WHERE (IFNULL(:filename, '') = '' OR filename = :filename)
               AND (IFNULL(:itemCode, '') = '' OR item_code REGEXP :itemCode)
@@ -348,7 +348,7 @@ export async function loadAltItemCodes(filename: string): Promise<ProductAltItem
                             i.ProductType,
                             i.InactiveItem
                      FROM c2.PM_ImageProducts ip
-                              INNER JOIN c2.ci_item i
+                              INNER JOIN c2.CI_Item i
                                          ON i.ItemCode = ip.item_code
                      WHERE (:filename IS NULL OR filename = :filename)`;
         const args = {filename};
