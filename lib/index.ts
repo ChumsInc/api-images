@@ -1,6 +1,6 @@
 import Debug from 'debug';
 import {Router} from 'express';
-import {deprecationNotice, logPath, validateRole, validateUser} from 'chums-local-modules';
+import {deprecationNotice, logAPIUsageMiddleware, logPath, validateRole, validateUser} from 'chums-local-modules';
 import {uploadProductImages} from './product-images/upload.js';
 import * as list from './product-images/list.js';
 import * as utils from './product-images/utils.js';
@@ -12,17 +12,18 @@ import {aboutAPI} from "./about/index.js";
 
 const debug = Debug('chums:lib');
 export const router = Router();
+const apiLogger = logAPIUsageMiddleware('api-images');
 
 router.use(logPath(debug));
 
 // public paths
-router.get('/products/find/:size/:itemCode', findImage);
-router.get('/products/list/all', list.getAllImages);
-router.get('/products/list/:filename', list.getImageByFilename);
+router.get('/products/find/:size/:itemCode', apiLogger, findImage);
+router.get('/products/list/all', apiLogger, list.getAllImages);
+router.get('/products/list/:filename', apiLogger, list.getImageByFilename);
 
 
 // below are routes that require validation
-router.use(logPath(debug), validateUser);
+router.use(logPath(debug), validateUser, apiLogger);
 router.get('/about.json', aboutAPI);
 router.get('/filters.json', getItemFilterOptions);
 router.get('/filters/:company', getItemFilterOptions);
