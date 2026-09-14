@@ -22,8 +22,8 @@ export async function makeImage(fromPath: string, imageSize: number, filename: s
         const buffer = await resized.toBuffer();
         debug('makeImage()', imgPath(imageSize, filename));
         await fs.writeFile(imgPath(imageSize, filename), buffer);
-
         const {width, height, size} = await sharp(buffer).metadata();
+
         return {path: imageSize.toString(), width: width ?? 0, height: height ?? 0, size: size ?? 0, filename};
     } catch (err: unknown) {
         if (err instanceof Error) {
